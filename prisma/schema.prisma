@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Testimonial {
+  id               String           @id @default(cuid())
+  name             String
+  role             String?
+  company          String?
+  industry         String?
+  content          String
+  rating           Int              @default(5)
+  avatarUrl        String?
+  imageUrl         String?
+  videoUrl         String?
+  youtubeVideoId   String?
+  cloudinaryPublicId String?
+  category           String   @default("CLIENTE")
+  tags               String?
+  featured           Boolean  @default(false)
+  approved           Boolean  @default(false)
+  createdByRole      String   @default("EDITOR")
+  reviewedByRole     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { extractYouTubeVideoId } from '@/lib/media'
+import { getSessionFromRequest } from '@/lib/auth'
 
 function normalizeTags(value: string | undefined) {
   if (!value) return null
@@ -9,12 +10,6 @@ function normalizeTags(value: string | undefined) {
     .map((tag) => tag.trim().toLowerCase())
     .filter(Boolean)
   return tags.length ? Array.from(new Set(tags)).join(', ') : null
-}
-
-function getRoleFromHeaders(request: Request) {
-  const headerValue = request.headers.get('x-user-role')
-  if (headerValue === 'ADMIN' || headerValue === 'EDITOR') return headerValue
-  return null
 }
 
 export async function GET(request: Request) {
@@ -54,7 +49,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const role = getRoleFromHeaders(request)
+    const session = await getSessionFromRequest(request)
+    const role = session?.role
 
     if (!role) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })

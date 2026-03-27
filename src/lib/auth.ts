@@ -92,3 +92,28 @@ export async function verifySessionToken(token: string | undefined, secret: stri
   const payload = await parseSessionToken(token, secret)
   return Boolean(payload)
 }
+
+function getCookieValue(cookieHeader: string | null, name: string) {
+  if (!cookieHeader) return undefined
+
+  const cookies = cookieHeader.split(';')
+  for (const cookie of cookies) {
+    const [key, ...rest] = cookie.trim().split('=')
+    if (key === name) return rest.join('=')
+  }
+
+  return undefined
+}
+
+export async function getSessionFromRequest(request: Request) {
+  const roleHeader = request.headers.get('x-user-role')
+  if (roleHeader === 'ADMIN' || roleHeader === 'EDITOR') {
+    return { role: roleHeader, exp: Number.MAX_SAFE_INTEGER }
+  }
+
+  const authSecret = process.env.AUTH_SECRET
+  if (!authSecret) return false
+
+  const token = getCookieValue(request.headers.get('cookie'), ADMIN_AUTH_COOKIE)
+  return parseSessionToken(token, authSecret)
+}

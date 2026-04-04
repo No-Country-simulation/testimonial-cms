@@ -20,18 +20,22 @@ export default async function Navbar() {
           >
             Vista pública
           </Link>
-          <Link
-            href="/docs/api"
-            className="text-sm text-gray-600 hover:text-indigo-600 transition-colors"
-          >
-            API Docs
-          </Link>
-          <Link
-            href="/demo/integration"
-            className="text-sm text-gray-600 hover:text-indigo-600 transition-colors"
-          >
-            Demo Embed
-          </Link>
+          {hasSession && (
+            <>
+              <Link
+                href="/docs/api"
+                className="text-sm text-gray-600 hover:text-indigo-600 transition-colors"
+              >
+                API Docs
+              </Link>
+              <Link
+                href="/demo/integration"
+                className="text-sm text-gray-600 hover:text-indigo-600 transition-colors"
+              >
+                Demo Embed
+              </Link>
+            </>
+          )}
 
           {hasSession ? (
             <>

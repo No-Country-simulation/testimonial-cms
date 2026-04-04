@@ -46,6 +46,15 @@ export default async function HomePage({
         </p>
       </div>
 
+      <div className="mb-6">
+        <Link
+          href="/admin/testimonials/new"
+          className="inline-block bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
+        >
+          + Nuevo Testimonio
+        </Link>
+      </div>
+
       <form className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-3">
         <input
           name="q"

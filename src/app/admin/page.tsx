@@ -42,12 +42,6 @@ export default async function AdminPage({
           <h1 className="text-3xl font-bold text-gray-900">Panel de Administración</h1>
           <p className="text-gray-500 text-sm mt-1">Gestiona todos los testimonios</p>
         </div>
-        <Link
-          href="/admin/testimonials/new"
-          className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
-        >
-          + Nuevo Testimonio
-        </Link>
       </div>
 
       {/* Stats */}
@@ -97,12 +91,6 @@ export default async function AdminPage({
         <div className="text-center py-24 text-gray-400 bg-white rounded-2xl border border-gray-100">
           <p className="text-4xl mb-3">💬</p>
           <p className="text-lg font-medium mb-4">No hay testimonios todavía</p>
-          <Link
-            href="/admin/testimonials/new"
-            className="inline-block bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
-          >
-            Crear el primero →
-          </Link>
         </div>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

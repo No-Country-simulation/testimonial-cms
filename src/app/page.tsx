@@ -48,7 +48,7 @@ export default async function HomePage({
 
       <div className="mb-6">
         <Link
-          href="/admin/testimonials/new"
+          href="/testimonials/new"
           className="inline-block bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
         >
           + Nuevo Testimonio
@@ -120,12 +120,12 @@ export default async function HomePage({
         <div className="text-center py-24 text-gray-400">
           <p className="text-5xl mb-4">💬</p>
           <p className="text-xl font-medium mb-2">Aún no hay testimonios</p>
-          <p className="text-sm mb-6">Empieza añadiendo el primero desde el panel de administración.</p>
+          <p className="text-sm mb-6">Comparte el primer testimonio para que el equipo lo revise y publique.</p>
           <Link
-            href="/admin"
+            href="/testimonials/new"
             className="inline-block bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
           >
-            Ir al Panel Admin →
+            Enviar Testimonio →
           </Link>
         </div>
       )}

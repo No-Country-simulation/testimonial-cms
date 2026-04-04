@@ -9,7 +9,7 @@ export default function NewTestimonialPage() {
           ← Volver al panel
         </Link>
       </div>
-      <TestimonialForm />
+      <TestimonialForm canModerate={true} afterSubmitRedirectTo="/admin" />
     </div>
   )
 }

@@ -6,9 +6,15 @@ import type { Testimonial } from '@/lib/types'
 
 type Props = {
   testimonial?: Testimonial
+  canModerate?: boolean
+  afterSubmitRedirectTo?: string
 }
 
-export default function TestimonialForm({ testimonial }: Props) {
+export default function TestimonialForm({
+  testimonial,
+  canModerate = true,
+  afterSubmitRedirectTo = '/admin',
+}: Props) {
   const router = useRouter()
   const isEditing = !!testimonial
 
@@ -25,7 +31,7 @@ export default function TestimonialForm({ testimonial }: Props) {
     category: testimonial?.category ?? 'CLIENTE',
     tags: testimonial?.tags ?? '',
     featured: testimonial?.featured ?? false,
-    approved: testimonial?.approved ?? true,
+    approved: testimonial?.approved ?? false,
   })
 
   const [loading, setLoading] = useState(false)
@@ -51,17 +57,31 @@ export default function TestimonialForm({ testimonial }: Props) {
       : '/api/testimonials'
     const method = isEditing ? 'PUT' : 'POST'
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, rating: Number(form.rating) }),
-    })
+    try {
+      const res = await fetch(url, {
+        method,
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, rating: Number(form.rating) }),
+      })
 
-    if (res.ok) {
-      router.push('/admin')
-      router.refresh()
-    } else {
-      setError('Ocurrió un error al guardar el testimonio. Inténtalo de nuevo.')
+      if (res.ok) {
+        router.push(afterSubmitRedirectTo)
+        router.refresh()
+        return
+      }
+
+      const payload = (await res.json().catch(() => null)) as { error?: string } | null
+      if (res.status === 401) {
+        setError('Tu sesión expiró. Inicia sesión nuevamente para guardar cambios.')
+        router.push('/login')
+        return
+      }
+
+      setError(payload?.error || 'Ocurrió un error al guardar el testimonio. Inténtalo de nuevo.')
+    } catch {
+      setError('No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.')
+    } finally {
       setLoading(false)
     }
   }
@@ -237,32 +257,39 @@ export default function TestimonialForm({ testimonial }: Props) {
         </div>
       </div>
 
-      {/* Opciones */}
-      <div className="flex gap-6 mb-8 p-4 bg-gray-50 rounded-xl">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            name="featured"
-            checked={form.featured}
-            onChange={handleChange}
-            className="w-4 h-4 accent-indigo-600"
-          />
-          <span className="text-sm text-gray-700">⭐ Destacado</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            name="approved"
-            checked={form.approved}
-            onChange={handleChange}
-            className="w-4 h-4 accent-green-600"
-          />
-          <span className="text-sm text-gray-700">✓ Aprobado</span>
-        </label>
-      </div>
-      <p className="text-xs text-gray-400 mb-6">
-        Moderación: las publicaciones de editores quedan pendientes hasta revisión de admin.
-      </p>
+      {canModerate ? (
+        <>
+          <div className="flex gap-6 mb-8 p-4 bg-gray-50 rounded-xl">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="featured"
+                checked={form.featured}
+                onChange={handleChange}
+                className="w-4 h-4 accent-indigo-600"
+              />
+              <span className="text-sm text-gray-700">⭐ Destacado</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="approved"
+                checked={form.approved}
+                onChange={handleChange}
+                className="w-4 h-4 accent-green-600"
+              />
+              <span className="text-sm text-gray-700">✓ Aprobado</span>
+            </label>
+          </div>
+          <p className="text-xs text-gray-400 mb-6">
+            Moderación: las publicaciones de editores quedan pendientes hasta revisión de admin.
+          </p>
+        </>
+      ) : (
+        <p className="text-xs text-gray-500 mb-6 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          Tu testimonio quedará pendiente hasta que un admin lo apruebe.
+        </p>
+      )}
 
       {/* Acciones */}
       <div className="flex gap-3">
@@ -275,7 +302,7 @@ export default function TestimonialForm({ testimonial }: Props) {
         </button>
         <button
           type="button"
-          onClick={() => router.push('/admin')}
+          onClick={() => router.push(afterSubmitRedirectTo)}
           className="bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm"
         >
           Cancelar

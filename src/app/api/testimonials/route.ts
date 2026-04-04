@@ -52,10 +52,6 @@ export async function POST(request: Request) {
     const session = await getSessionFromRequest(request)
     const role = session?.role
 
-    if (!role) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
-    }
-
     if (!body.name || !body.content) {
       return NextResponse.json(
         { error: 'El nombre y el contenido son obligatorios' },
@@ -69,6 +65,7 @@ export async function POST(request: Request) {
 
     const youtubeVideoId = extractYouTubeVideoId(body.videoUrl)
     const canModerate = role === 'ADMIN'
+    const createdByRole = role ?? 'VISITOR'
 
     const testimonial = await prisma.testimonial.create({
       data: {
@@ -87,7 +84,7 @@ export async function POST(request: Request) {
         tags: normalizeTags(body.tags),
         featured: canModerate ? Boolean(body.featured) : false,
         approved: canModerate ? Boolean(body.approved) : false,
-        createdByRole: role,
+        createdByRole,
         reviewedByRole: canModerate ? role : null,
       },
     })

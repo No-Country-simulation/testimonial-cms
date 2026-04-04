@@ -26,7 +26,11 @@ export default async function EditTestimonialPage({
           ← Volver al panel
         </Link>
       </div>
-      <TestimonialForm testimonial={testimonial} />
+      <TestimonialForm
+        testimonial={testimonial}
+        canModerate={true}
+        afterSubmitRedirectTo="/admin"
+      />
     </div>
   )
 }

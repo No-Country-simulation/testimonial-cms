@@ -23,6 +23,7 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith('/api/testimonials') &&
     request.method !== 'GET' &&
+    request.method !== 'POST' &&
     !authenticated
   ) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })

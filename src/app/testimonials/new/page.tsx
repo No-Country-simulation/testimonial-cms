@@ -1,7 +1,22 @@
 import Link from 'next/link'
 import TestimonialForm from '@/components/TestimonialForm'
+import { cookies } from 'next/headers'
+import { ADMIN_AUTH_COOKIE, parseSessionToken } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
-export default function NewPublicTestimonialPage() {
+export default async function NewPublicTestimonialPage() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get(ADMIN_AUTH_COOKIE)?.value
+  const authSecret = process.env.AUTH_SECRET
+  const session = authSecret ? await parseSessionToken(token, authSecret) : false
+
+  if (!session) {
+    redirect('/login')
+  }
+
+  const lockName = session.role === 'USER' && Boolean(session.username)
+  const forcedName = lockName ? session.username : undefined
+
   return (
     <div>
       <div className="mb-6">
@@ -16,7 +31,12 @@ export default function NewPublicTestimonialPage() {
         </Link>
         .
       </div>
-      <TestimonialForm canModerate={false} afterSubmitRedirectTo="/" />
+      <TestimonialForm
+        canModerate={false}
+        afterSubmitRedirectTo="/"
+        forcedName={forcedName}
+        lockName={lockName}
+      />
     </div>
   )
 }

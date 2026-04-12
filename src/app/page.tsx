@@ -2,12 +2,20 @@ import { prisma } from '@/lib/prisma'
 import TestimonialCard from '@/components/TestimonialCard'
 import Link from 'next/link'
 import type { Testimonial } from '@/lib/types'
+import { cookies } from 'next/headers'
+import { ADMIN_AUTH_COOKIE, parseSessionToken } from '@/lib/auth'
 
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; category?: string; tag?: string }>
 }) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get(ADMIN_AUTH_COOKIE)?.value
+  const authSecret = process.env.AUTH_SECRET
+  const session = authSecret ? await parseSessionToken(token, authSecret) : false
+  const testimonialCtaHref = session ? '/testimonials/new' : '/login'
+
   const { q = '', category = '', tag = '' } = await searchParams
 
   const testimonials = (await prisma.testimonial.findMany({
@@ -48,7 +56,7 @@ export default async function HomePage({
 
       <div className="mb-6">
         <Link
-          href="/testimonials/new"
+          href={testimonialCtaHref}
           className="inline-block bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
         >
           + Nuevo Testimonio
@@ -122,7 +130,7 @@ export default async function HomePage({
           <p className="text-xl font-medium mb-2">Aún no hay testimonios</p>
           <p className="text-sm mb-6">Comparte el primer testimonio para que el equipo lo revise y publique.</p>
           <Link
-            href="/testimonials/new"
+            href={testimonialCtaHref}
             className="inline-block bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
           >
             Enviar Testimonio →

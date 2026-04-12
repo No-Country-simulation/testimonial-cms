@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Testimonial } from '@/lib/types'
 
@@ -8,18 +8,22 @@ type Props = {
   testimonial?: Testimonial
   canModerate?: boolean
   afterSubmitRedirectTo?: string
+  forcedName?: string
+  lockName?: boolean
 }
 
 export default function TestimonialForm({
   testimonial,
   canModerate = true,
   afterSubmitRedirectTo = '/admin',
+  forcedName,
+  lockName = false,
 }: Props) {
   const router = useRouter()
   const isEditing = !!testimonial
 
   const [form, setForm] = useState({
-    name: testimonial?.name ?? '',
+    name: forcedName ?? testimonial?.name ?? '',
     role: testimonial?.role ?? '',
     company: testimonial?.company ?? '',
     industry: testimonial?.industry ?? '',
@@ -36,6 +40,11 @@ export default function TestimonialForm({
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!lockName || !forcedName) return
+    setForm((prev) => ({ ...prev, name: forcedName }))
+  }, [forcedName, lockName])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -113,8 +122,15 @@ export default function TestimonialForm({
             onChange={handleChange}
             required
             placeholder="Ana García"
+            readOnly={lockName}
+            disabled={lockName}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
           />
+          {lockName && (
+            <p className="text-xs text-gray-400 mt-1">
+              Este nombre se toma de tu usuario y no puede modificarse.
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>

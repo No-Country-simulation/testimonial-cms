@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node --max-old-space-size=2048 ./node_modules/next/dist/bin/next dev --webpack",
+    "dev:turbo": "next dev",
+    "dev:root": "npm run dev",
     "build": "next build",
+    "build:root": "npm run build",
     "start": "next start",
+    "start:root": "npm run start",
     "lint": "next lint",
+    "lint:root": "npm run lint",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate"

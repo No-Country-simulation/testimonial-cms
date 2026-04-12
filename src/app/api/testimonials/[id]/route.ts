@@ -34,11 +34,12 @@ export async function PUT(request: Request, { params }: Params) {
     const { id } = await params
     const body = await request.json()
     const session = await getSessionFromRequest(request)
-    const role = session?.role
 
-    if (!role) {
+    if (!session) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
+
+    const role = session.role
 
     const existing = await prisma.testimonial.findUnique({ where: { id } })
 
@@ -105,7 +106,7 @@ export async function PUT(request: Request, { params }: Params) {
 export async function DELETE(_request: Request, { params }: Params) {
   try {
     const session = await getSessionFromRequest(_request)
-    if (session?.role !== 'ADMIN') {
+    if (!session || session.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Solo admin puede eliminar' }, { status: 403 })
     }
 

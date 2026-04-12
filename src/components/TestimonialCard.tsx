@@ -94,11 +94,18 @@ export default function TestimonialCard({
       </div>
 
       {/* Badge */}
-      {testimonial.featured && (
-        <span className="self-start text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium">
-          ⭐ Destacado
-        </span>
-      )}
+      <div className="flex flex-wrap gap-2">
+        {testimonial.featured && (
+          <span className="self-start text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium">
+            ⭐ Destacado
+          </span>
+        )}
+        {testimonial.authorUsername && (
+          <span className="self-start text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full font-medium">
+            ✓ Acreditado: @{testimonial.authorUsername}
+          </span>
+        )}
+      </div>
     </div>
   )
 }

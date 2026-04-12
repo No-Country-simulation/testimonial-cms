@@ -13,9 +13,11 @@ async function isAuthenticated(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const session = await isAuthenticated(request)
-  const authenticated = Boolean(session)
+  const adminAreaAuthenticated = Boolean(
+    session && (session.role === 'ADMIN' || session.role === 'EDITOR')
+  )
 
-  if (pathname.startsWith('/admin') && !authenticated) {
+  if (pathname.startsWith('/admin') && !adminAreaAuthenticated) {
     const loginUrl = new URL('/login', request.url)
     return NextResponse.redirect(loginUrl)
   }
@@ -24,12 +26,12 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/testimonials') &&
     request.method !== 'GET' &&
     request.method !== 'POST' &&
-    !authenticated
+    !session
   ) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
-  if (pathname.startsWith('/api/integrations') && !authenticated) {
+  if (pathname.startsWith('/api/integrations') && !session) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
@@ -45,6 +47,8 @@ export async function middleware(request: NextRequest) {
   if (session) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-user-role', session.role)
+    if (session.userId) requestHeaders.set('x-user-id', session.userId)
+    if (session.username) requestHeaders.set('x-user-username', session.username)
     return NextResponse.next({
       request: {
         headers: requestHeaders,

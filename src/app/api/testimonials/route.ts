@@ -50,7 +50,15 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const session = await getSessionFromRequest(request)
-    const role = session?.role
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Debes iniciar sesión para publicar una reseña' },
+        { status: 401 }
+      )
+    }
+
+    const role = session.role
 
     if (!body.name || !body.content) {
       return NextResponse.json(
@@ -65,7 +73,7 @@ export async function POST(request: Request) {
 
     const youtubeVideoId = extractYouTubeVideoId(body.videoUrl)
     const canModerate = role === 'ADMIN'
-    const createdByRole = role ?? 'VISITOR'
+    const createdByRole = role
 
     const testimonial = await prisma.testimonial.create({
       data: {
@@ -85,6 +93,8 @@ export async function POST(request: Request) {
         featured: canModerate ? Boolean(body.featured) : false,
         approved: canModerate ? Boolean(body.approved) : false,
         createdByRole,
+        authorUserId: role === 'USER' ? session.userId || null : null,
+        authorUsername: role === 'USER' ? session.username || null : null,
         reviewedByRole: canModerate ? role : null,
       },
     })

@@ -9,9 +9,11 @@ export default function ApiDocsPage() {
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-3">
         <h2 className="text-xl font-semibold">Autenticación y roles</h2>
         <ul className="text-sm text-gray-700 space-y-1 list-disc pl-5">
-          <li>POST /api/auth/login — body: username (admin|editor), password</li>
+          <li>POST /api/auth/register — body: username, password</li>
+          <li>POST /api/auth/login — body: username, password</li>
           <li>POST /api/auth/logout</li>
-          <li>Roles disponibles: ADMIN, EDITOR y VISITOR (público)</li>
+          <li>Roles disponibles: ADMIN, EDITOR y USER</li>
+          <li>POST de testimonios: requiere sesión activa</li>
           <li>DELETE de testimonios: solo ADMIN</li>
         </ul>
       </section>

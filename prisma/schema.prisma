@@ -30,7 +30,21 @@ model Testimonial {
   featured           Boolean  @default(false)
   approved           Boolean  @default(false)
   createdByRole      String   @default("EDITOR")
+  authorUserId       String?
+  authorUsername     String?
   reviewedByRole     String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  authorUser         User?    @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
+
+  @@index([authorUserId])
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  testimonials Testimonial[]
 }

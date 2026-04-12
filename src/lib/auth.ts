@@ -2,11 +2,18 @@ const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
 export const ADMIN_AUTH_COOKIE = 'admin_auth'
-export type SessionRole = 'ADMIN' | 'EDITOR'
+export type SessionRole = 'ADMIN' | 'EDITOR' | 'USER'
 
 type SessionPayload = {
   exp: number
   role: SessionRole
+  userId?: string
+  username?: string
+}
+
+type SessionIdentity = {
+  userId?: string
+  username?: string
 }
 
 function base64UrlEncode(input: string) {
@@ -58,10 +65,11 @@ async function hmacSha256(secret: string, payload: string) {
 export async function createSessionToken(
   secret: string,
   ttlSeconds: number,
-  role: SessionRole
+  role: SessionRole,
+  identity: SessionIdentity = {}
 ) {
   const exp = Math.floor(Date.now() / 1000) + ttlSeconds
-  const payload = JSON.stringify({ exp, role } satisfies SessionPayload)
+  const payload = JSON.stringify({ exp, role, ...identity } satisfies SessionPayload)
   const payloadEncoded = base64UrlEncode(payload)
   const signature = await hmacSha256(secret, payloadEncoded)
   return `${payloadEncoded}.${signature}`
@@ -81,7 +89,10 @@ export async function parseSessionToken(token: string | undefined, secret: strin
     const payload = JSON.parse(base64UrlDecode(payloadEncoded)) as SessionPayload
     if (!payload.exp || !payload.role) return false
     if (payload.exp <= Math.floor(Date.now() / 1000)) return false
-    if (payload.role !== 'ADMIN' && payload.role !== 'EDITOR') return false
+    if (payload.role !== 'ADMIN' && payload.role !== 'EDITOR' && payload.role !== 'USER') {
+      return false
+    }
+    if (payload.role === 'USER' && (!payload.userId || !payload.username)) return false
     return payload
   } catch {
     return false
@@ -107,8 +118,25 @@ function getCookieValue(cookieHeader: string | null, name: string) {
 
 export async function getSessionFromRequest(request: Request) {
   const roleHeader = request.headers.get('x-user-role')
+  const userIdHeader = request.headers.get('x-user-id')
+  const usernameHeader = request.headers.get('x-user-username')
+
   if (roleHeader === 'ADMIN' || roleHeader === 'EDITOR') {
-    return { role: roleHeader, exp: Number.MAX_SAFE_INTEGER }
+    return {
+      role: roleHeader,
+      exp: Number.MAX_SAFE_INTEGER,
+      userId: userIdHeader || undefined,
+      username: usernameHeader || undefined,
+    }
+  }
+
+  if (roleHeader === 'USER' && userIdHeader && usernameHeader) {
+    return {
+      role: 'USER' as const,
+      exp: Number.MAX_SAFE_INTEGER,
+      userId: userIdHeader,
+      username: usernameHeader,
+    }
   }
 
   const authSecret = process.env.AUTH_SECRET

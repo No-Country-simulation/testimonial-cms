@@ -15,8 +15,10 @@ export type Testimonial = {
   tags: string | null
   featured: boolean
   approved: boolean
-  createdByRole: 'ADMIN' | 'EDITOR' | 'VISITOR'
-  reviewedByRole: 'ADMIN' | 'EDITOR' | 'VISITOR' | null
+  createdByRole: 'ADMIN' | 'EDITOR' | 'USER'
+  authorUserId: string | null
+  authorUsername: string | null
+  reviewedByRole: 'ADMIN' | 'EDITOR' | 'USER' | null
   createdAt: Date | string
   updatedAt: Date | string
 }

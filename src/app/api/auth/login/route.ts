@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { ADMIN_AUTH_COOKIE, createSessionToken, SessionRole } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { verifyPassword } from '@/lib/password'
 
 const SESSION_TTL_SECONDS = 60 * 60 * 12
 
@@ -21,16 +23,35 @@ export async function POST(request: Request) {
     }
 
     let role: SessionRole | null = null
+    let userId: string | undefined
+    let sessionUsername: string | undefined
+
     if (username === 'admin' && password === adminPassword) role = 'ADMIN'
     if (username === 'editor' && password === editorPassword) role = 'EDITOR'
+
+    if (!role) {
+      const user = await prisma.user.findUnique({
+        where: { username },
+        select: { id: true, username: true, passwordHash: true },
+      })
+
+      if (user && verifyPassword(password, user.passwordHash)) {
+        role = 'USER'
+        userId = user.id
+        sessionUsername = user.username
+      }
+    }
 
     if (!role) {
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 })
     }
 
-    const token = await createSessionToken(authSecret, SESSION_TTL_SECONDS, role)
+    const token = await createSessionToken(authSecret, SESSION_TTL_SECONDS, role, {
+      userId,
+      username: sessionUsername,
+    })
 
-    const response = NextResponse.json({ ok: true, role })
+    const response = NextResponse.json({ ok: true, role, username: sessionUsername })
     response.cookies.set({
       name: ADMIN_AUTH_COOKIE,
       value: token,

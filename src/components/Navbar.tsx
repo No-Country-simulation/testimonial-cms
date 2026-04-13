@@ -21,12 +21,6 @@ export default async function Navbar() {
           💬 Testimonial CMS
         </Link>
         <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="text-sm text-gray-600 hover:text-indigo-600 transition-colors"
-          >
-            Vista pública
-          </Link>
           {isAdminAreaUser && (
             <>
               <Link

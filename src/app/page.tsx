@@ -17,6 +17,7 @@ export default async function HomePage({
   const testimonialCtaHref = session ? '/testimonials/new' : '/login'
 
   const { q = '', category = '', tag = '' } = await searchParams
+  const hasActiveFilters = Boolean(q || tag || category)
 
   const testimonials = (await prisma.testimonial.findMany({
     where: {
@@ -44,56 +45,64 @@ export default async function HomePage({
   return (
     <div>
       {/* Hero */}
-      <div className="text-center mb-14 py-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-          Lo que dicen nuestros{' '}
-          <span className="text-indigo-600">clientes</span>
-        </h1>
-        <p className="text-lg text-gray-500 max-w-xl mx-auto">
-          Testimonios reales de personas que confían en nosotros cada día.
-        </p>
-      </div>
-
-      <div className="mb-6">
+      <div className="mb-10 py-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <div className="text-center md:text-left">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+            Lo que dicen nuestros{' '}
+            <span className="text-indigo-600">clientes</span>
+          </h1>
+          <p className="text-lg text-gray-500 max-w-xl md:max-w-2xl">
+            Testimonios reales de personas que confían en nosotros cada día.
+          </p>
+        </div>
         <Link
           href={testimonialCtaHref}
-          className="inline-block bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
+          className="inline-block bg-indigo-600 text-white px-7 py-3.5 rounded-xl hover:bg-indigo-700 transition-colors font-semibold text-base self-center md:self-auto whitespace-nowrap"
         >
           + Nuevo Testimonio
         </Link>
       </div>
 
-      <form className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-3">
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="Búsqueda inteligente por contenido, empresa o tags"
-          className="md:col-span-2 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        />
-        <input
-          name="tag"
-          defaultValue={tag}
-          placeholder="Tag (ej: bootcamp)"
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        />
-        <select
-          name="category"
-          defaultValue={category}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        >
-          <option value="">Todas las categorías</option>
-          <option value="PRODUCTO">Producto</option>
-          <option value="EVENTO">Evento</option>
-          <option value="CLIENTE">Cliente</option>
-          <option value="INDUSTRIA">Industria</option>
-        </select>
-        <button
-          type="submit"
-          className="md:col-span-4 justify-self-start bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-        >
-          Aplicar filtros
-        </button>
-      </form>
+      <details
+        className="mb-8 bg-white border border-gray-100 rounded-xl shadow-sm"
+        open={hasActiveFilters}
+      >
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-gray-700 flex items-center justify-between">
+          <span>Filtros de búsqueda</span>
+          <span className="text-xs text-gray-400">Desplegar</span>
+        </summary>
+        <form className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border-t border-gray-100">
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Búsqueda inteligente por contenido, empresa o tags"
+            className="md:col-span-2 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          />
+          <input
+            name="tag"
+            defaultValue={tag}
+            placeholder="Tag (ej: bootcamp)"
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          />
+          <select
+            name="category"
+            defaultValue={category}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          >
+            <option value="">Todas las categorías</option>
+            <option value="PRODUCTO">Producto</option>
+            <option value="EVENTO">Evento</option>
+            <option value="CLIENTE">Cliente</option>
+            <option value="INDUSTRIA">Industria</option>
+          </select>
+          <button
+            type="submit"
+            className="md:col-span-4 justify-self-start bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+          >
+            Aplicar filtros
+          </button>
+        </form>
+      </details>
 
       {/* Featured */}
       {featured.length > 0 && (

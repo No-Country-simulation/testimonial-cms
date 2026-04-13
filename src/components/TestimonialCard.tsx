@@ -22,10 +22,10 @@ export default function TestimonialCard({
 
   return (
     <div
-      className={`bg-white rounded-2xl p-6 shadow-sm border flex flex-col gap-4 ${
+      className={`bg-white rounded-2xl p-6 shadow-[0_12px_30px_rgba(15,23,42,0.1)] border flex flex-col gap-4 ${
         testimonial.featured
-          ? 'border-indigo-200 ring-2 ring-indigo-50'
-          : 'border-gray-100'
+          ? 'border-indigo-300 ring-2 ring-indigo-100'
+          : 'border-gray-300'
       }`}
     >
       {/* Avatar + Info */}

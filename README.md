@@ -41,12 +41,10 @@ npm run dev
 
 Si quieres mostrar el proyecto en GitHub con preview visual, agrega capturas en `docs/screenshots/` y enlazalas aqui:
 
-```md
 ![Home](docs/screenshots/home.png)
 ![Login y registro](docs/screenshots/login-register.png)
 ![Panel admin](docs/screenshots/admin.png)
 ![Nuevo testimonio](docs/screenshots/new-testimonial.png)
-```
 
 Tip: usa imagenes de 1280x720 o 1440x900 para que se vean bien en el README.
 

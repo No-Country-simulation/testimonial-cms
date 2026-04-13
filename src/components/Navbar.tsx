@@ -58,12 +58,12 @@ export default async function Navbar() {
               <LogoutButton />
             </>
           ) : (
-            <Link
+            <Links
               href="/login?mode=login"
               className="bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
             >
               Iniciar sesión
-            </Link>
+            </Links>
           )}
         </div>
       </div>

@@ -6,13 +6,17 @@ export default function LogoutButton() {
   const router = useRouter()
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' })
-    router.push('/login')
-    router.refresh()
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } finally {
+      router.replace('/')
+      router.refresh()
+    }
   }
 
   return (
     <button
+      type="button"
       onClick={handleLogout}
       className="text-sm text-gray-600 hover:text-red-600 transition-colors"
     >

@@ -22,50 +22,47 @@ export default function TestimonialCard({
 
   return (
     <div
-      className={`bg-white rounded-2xl p-6 shadow-[0_12px_30px_rgba(15,23,42,0.1)] border flex flex-col gap-4 ${
-        testimonial.featured
-          ? 'border-indigo-300 ring-2 ring-indigo-100'
-          : 'border-gray-300'
+      className={`relative rounded-2xl border bg-slate-50/50 px-6 pb-6 pt-14 shadow-[0_20px_44px_rgba(15,23,42,0.15)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_28px_52px_rgba(15,23,42,0.2)] ${
+        testimonial.featured ? 'border-indigo-400 ring-2 ring-indigo-100' : 'border-slate-400'
       }`}
     >
-      {/* Avatar + Info */}
-      <div className="flex items-center gap-3">
+      <div className="absolute -top-6 left-6">
         {testimonial.avatarUrl ? (
           <img
             src={testimonial.avatarUrl}
             alt={testimonial.name}
-            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+            className="h-16 w-16 rounded-full border-4 border-white object-cover shadow-sm"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
+          <div className="h-16 w-16 rounded-full border-4 border-white bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-base shadow-sm">
             {initials}
           </div>
         )}
-        <div>
-          <p className="font-semibold text-gray-900 leading-tight">{testimonial.name}</p>
-          {(testimonial.role || testimonial.company) && (
-            <p className="text-xs text-gray-400 mt-0.5">
-              {testimonial.role}
-              {testimonial.role && testimonial.company && ' · '}
-              {testimonial.company}
-            </p>
-          )}
-        </div>
       </div>
 
-      {/* Rating */}
-      <StarRating rating={testimonial.rating} />
+      <div className="mb-2">
+        <p className="text-2xl font-semibold text-gray-900 leading-tight">{testimonial.name}</p>
+        {(testimonial.role || testimonial.company) && (
+          <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            {testimonial.role}
+            {testimonial.role && testimonial.company && ' · '}
+            {testimonial.company}
+          </p>
+        )}
+      </div>
 
-      {/* Content */}
-      <p className="text-gray-700 leading-relaxed text-sm flex-1">
-        &ldquo;{testimonial.content}&rdquo;
-      </p>
+      <p className="text-lg leading-relaxed text-gray-700">&ldquo;{testimonial.content}&rdquo;</p>
+
+      <div className="mt-4 flex items-end justify-between">
+        <StarRating rating={testimonial.rating} size="sm" />
+        <span className="select-none text-6xl leading-none text-slate-100">&rdquo;</span>
+      </div>
 
       {testimonial.imageUrl && (
         <img
           src={testimonial.imageUrl}
           alt={`Imagen de ${testimonial.name}`}
-          className="w-full h-40 object-cover rounded-xl border border-gray-100"
+          className="mt-4 h-40 w-full rounded-xl border border-gray-100 object-cover"
         />
       )}
 
@@ -73,13 +70,13 @@ export default function TestimonialCard({
         <iframe
           src={`https://www.youtube.com/embed/${testimonial.youtubeVideoId}`}
           title={`Video de ${testimonial.name}`}
-          className="w-full h-40 rounded-xl border border-gray-100"
+          className="mt-4 h-40 w-full rounded-xl border border-gray-100"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
       )}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
           {categoryLabel[testimonial.category]}
         </span>
@@ -93,8 +90,7 @@ export default function TestimonialCard({
         ))}
       </div>
 
-      {/* Badge */}
-      <div className="flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-2">
         {testimonial.featured && (
           <span className="self-start text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium">
             ⭐ Destacado

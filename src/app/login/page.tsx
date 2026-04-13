@@ -1,11 +1,11 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [mode, setMode] = useState<'login' | 'register' | null>(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -13,10 +13,23 @@ export default function LoginPage() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const requestedMode = params.get('mode')
+    if (requestedMode === 'login' || requestedMode === 'register') {
+      setMode(requestedMode)
+    }
+  }, [])
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
     setSuccess('')
+
+    if (!mode) {
+      setError('Primero elige Iniciar sesión o Registrarme')
+      return
+    }
 
     const normalizedUsername = username.trim().toLowerCase()
     if (!normalizedUsername) {
@@ -128,88 +141,96 @@ export default function LoginPage() {
         </button>
       </div>
 
-      <div className="mb-6 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900">
-        <p className="font-medium mb-1">Credenciales</p>
-        <p>Admin/Editor: usan variables de entorno.</p>
-        <p>Usuario de reseñas: créalo desde la pestaña Registrarme.</p>
-        <p className="mt-1">
-          Reglas del usuario: 3-24 caracteres, minúsculas, números y guion bajo.
-        </p>
-      </div>
+      {mode && (
+        <>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="username" className="block text-sm text-gray-700 mb-1">
+                Usuario
+              </label>
+              <input
+                id="username"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                required
+                autoComplete="username"
+                placeholder="ej: maria_2026"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              />
+            </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="username" className="block text-sm text-gray-700 mb-1">
-            Usuario
-          </label>
-          <input
-            id="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            required
-            autoComplete="username"
-            placeholder="ej: maria_2026"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-          />
-        </div>
+            <div>
+              <label htmlFor="password" className="block text-sm text-gray-700 mb-1">
+                Contraseña
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                placeholder="••••••••"
+              />
+            </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm text-gray-700 mb-1">
-            Contraseña
-          </label>
-          <input
-            id="password"
-            type="password"
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            placeholder="••••••••"
-          />
-        </div>
+            {mode === 'register' && (
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm text-gray-700 mb-1">
+                  Confirmar contraseña
+                </label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  autoComplete="new-password"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
 
-        {mode === 'register' && (
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm text-gray-700 mb-1">
-              Confirmar contraseña
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              required
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              autoComplete="new-password"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-              placeholder="••••••••"
-            />
-          </div>
-        )}
+            {error && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg p-2">{error}</p>
+            )}
+            {success && (
+              <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg p-2">
+                {success}
+              </p>
+            )}
 
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg p-2">{error}</p>
-        )}
-        {success && (
-          <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg p-2">
-            {success}
-          </p>
-        )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            >
+              {loading
+                ? mode === 'login'
+                  ? 'Ingresando...'
+                  : 'Creando usuario...'
+                : mode === 'login'
+                  ? 'Ingresar'
+                  : 'Crear usuario'}
+            </button>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
-        >
-          {loading
-            ? mode === 'login'
-              ? 'Ingresando...'
-              : 'Creando usuario...'
-            : mode === 'login'
-              ? 'Ingresar'
-              : 'Crear usuario'}
-        </button>
-      </form>
+            <div className="rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900">
+              <p className="font-medium mb-1">Credenciales</p>
+              <p>Admin/Editor: usan variables de entorno.</p>
+              <p>Usuario de reseñas: créalo desde la pestaña Registrarme.</p>
+              <p className="mt-1">
+                Reglas del usuario: 3-24 caracteres, minúsculas, números y guion bajo.
+              </p>
+            </div>
+          </form>
+        </>
+      )}
+
+      {error && !mode && (
+        <p className="mt-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg p-2">{error}</p>
+      )}
     </div>
   )
 }

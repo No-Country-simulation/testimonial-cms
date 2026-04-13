@@ -59,7 +59,7 @@ export default async function Navbar() {
             </>
           ) : (
             <Link
-              href="/login"
+              href="/login?mode=login"
               className="bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
             >
               Iniciar sesión
